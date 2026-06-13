@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BassTrack</title>
+    <link rel="stylesheet" href="./style.css?v=3" />
+    <script defer src="./script.js?v=3"></script>
+  </head>
+  <body>
+    <div id="toast" class="toast">
+      <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <path d="m9 11 3 3L22 4"></path>
+      </svg>
+      <span id="toast-text">기록이 성공적으로 저장되었습니다!</span>
+    </div>
+
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg class="icon icon-md icon-filled" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+          </div>
+          <span class="brand-name">BassTrack</span>
+        </div>
+        <div class="profile-badge">HK</div>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <div id="main-screen" class="screen screen-animated">
+        <div class="search-box">
+          <svg class="icon search-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input
+            id="search-input"
+            class="search-input"
+            type="text"
+            placeholder="곡명 또는 아티스트 검색"
+            aria-label="곡명 또는 아티스트 검색"
+          />
+          <button id="clear-search-btn" class="icon-button search-clear" type="button" aria-label="검색어 지우기">
+            <svg class="icon icon-md" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 6 6 18"></path>
+              <path d="m6 6 12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="section-heading">
+          <div>
+            <h2>나의 연습 목록</h2>
+            <p id="active-count">0개의 프로젝트 진행 중</p>
+          </div>
+          <div class="section-guide">
+            곡을 클릭하거나 추가하여 진행 상황을 손쉽게 기록하세요.
+          </div>
+        </div>
+
+        <div id="track-list-container" class="track-list"></div>
+
+        <div id="main-add-challenge-btn" class="add-callout" role="button" tabindex="0">
+          <p>새로운 도전 추가</p>
+          <button class="add-callout-button" type="button" tabindex="-1">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5v14"></path>
+              <path d="M5 12h14"></path>
+            </svg>
+            <span>곡 추가하기</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="detail-screen" class="screen screen-animated hidden">
+        <div class="back-row">
+          <button id="detail-back-btn" class="back-button" type="button">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m15 18-6-6 6-6"></path>
+            </svg>
+            <span>뒤로가기</span>
+          </button>
+        </div>
+
+        <div id="detail-heading-view" class="detail-heading">
+          <h1 id="detail-title-text" class="detail-title-text"></h1>
+          <p id="detail-artist-text" class="detail-artist-text"></p>
+          <div class="detail-heading-buttons">
+            <button id="detail-edit-btn" class="detail-edit-button" type="button">수정</button>
+            <button id="detail-delete-btn" class="detail-delete-button" type="button">곡 삭제</button>
+          </div>
+        </div>
+
+        <div id="detail-heading-edit" class="detail-heading detail-heading-edit hidden">
+          <input
+            id="detail-title"
+            class="detail-title-input"
+            type="text"
+            aria-label="곡명"
+            placeholder="곡명"
+          />
+          <input
+            id="detail-artist"
+            class="detail-artist-input"
+            type="text"
+            aria-label="아티스트명"
+            placeholder="아티스트명"
+          />
+          <div class="detail-edit-actions">
+            <button id="detail-edit-save-btn" class="detail-edit-save" type="button">저장</button>
+            <button id="detail-edit-cancel-btn" class="detail-edit-cancel" type="button">취소</button>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <h3>트랙 상태</h3>
+          <div class="status-buttons">
+            <button data-status="시작 전" class="status-btn" type="button">시작 전</button>
+            <button data-status="카피 중" class="status-btn" type="button">카피 중</button>
+            <button data-status="연습 중" class="status-btn" type="button">연습 중</button>
+            <button data-status="완료" class="status-btn" type="button">완료</button>
+            <button data-status="보류" class="status-btn" type="button">보류</button>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <h3>진행 상황 기록</h3>
+          <textarea
+            id="detail-progress"
+            class="detail-textarea"
+            placeholder="어디까지 진행했는지 기록하세요..."
+          ></textarea>
+        </div>
+
+        <div class="detail-card">
+          <h3>연습 메모 추가</h3>
+          <textarea
+            id="detail-memo"
+            class="detail-textarea"
+            maxlength="100"
+            placeholder="연습 중 느낀 점이나 주의할 부분을 적어보세요."
+          ></textarea>
+          <div class="memo-add-row">
+            <button id="detail-memo-add-btn" class="memo-add-button" type="button">
+              메모 추가
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div class="memo-heading">
+            <h3>메모 히스토리</h3>
+            <span id="memo-count">총 0개</span>
+          </div>
+          <div id="memo-history-container" class="memo-history"></div>
+        </div>
+
+        <div class="detail-actions">
+          <button id="detail-save-btn" class="save-button" type="button">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path>
+              <path d="M17 21v-8H7v8"></path>
+              <path d="M7 3v5h8"></path>
+            </svg>
+            <span>기록 저장하기</span>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <div id="add-track-modal" class="modal hidden">
+      <div id="modal-backdrop" class="modal-backdrop"></div>
+      <div class="modal-card">
+        <div class="modal-heading">
+          <h3>새로운 연습곡 추가</h3>
+          <button id="modal-close-btn" class="icon-button modal-close" type="button" aria-label="곡 추가 창 닫기">
+            <svg class="icon icon-md" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 6 6 18"></path>
+              <path d="m6 6 12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-fields">
+          <div>
+            <label for="add-modal-title">곡명 <span>*</span></label>
+            <input
+              id="add-modal-title"
+              class="modal-input"
+              type="text"
+              placeholder="곡명을 입력하세요"
+            />
+          </div>
+          <div>
+            <label for="add-modal-artist">아티스트명</label>
+            <input
+              id="add-modal-artist"
+              class="modal-input"
+              type="text"
+              placeholder="아티스트 이름을 입력하세요"
+            />
+          </div>
+          <div id="modal-error-msg" class="modal-error hidden">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 8v4"></path>
+              <path d="M12 16h.01"></path>
+            </svg>
+            <span>곡명은 필수 입력 항목입니다.</span>
+          </div>
+          <div class="modal-actions">
+            <button id="modal-cancel-btn" class="modal-cancel" type="button">취소</button>
+            <button id="modal-submit-btn" class="modal-submit" type="button">추가하기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
