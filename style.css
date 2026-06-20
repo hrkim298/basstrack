@@ -203,6 +203,39 @@ svg {
   max-width: 576px;
 }
 
+/* 상태 필터 */
+.status-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 576px;
+}
+
+.filter-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--slate-200);
+  border-radius: 9999px;
+  outline: none;
+  background: #fff;
+  color: var(--slate-500);
+  font-size: 12px;
+  font-weight: 600;
+  transition: all .15s;
+}
+
+.filter-btn:hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+  background: #eff4ff;
+}
+
+.filter-btn.is-active {
+  border-color: var(--brand-primary);
+  background: var(--brand-primary);
+  color: #fff;
+  font-weight: 700;
+}
+
 .search-icon {
   position: absolute;
   left: 16px;
@@ -336,6 +369,31 @@ svg {
   margin: 2px 0 0;
   color: var(--slate-400);
   font-size: 12px;
+  font-weight: 600;
+}
+
+/* 메인 리스트 - 악기 태그 & 시작일 */
+.track-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.track-instrument-tag {
+  padding: 2px 8px;
+  border: 1px solid #dbeafe;
+  border-radius: 9999px;
+  background: #eff6ff;
+  color: var(--brand-primary);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.track-start-date {
+  color: var(--slate-400);
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -970,6 +1028,61 @@ svg {
   font-size: 14px;
   font-weight: 600;
   transition: all .15s;
+  background: #fff;
+}
+
+.modal-select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+/* 상세 페이지 - 연습 정보 카드 */
+.detail-info-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.detail-info-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.detail-info-label {
+  color: var(--slate-400);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.detail-info-input,
+.detail-info-select {
+  padding: 8px 10px;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  outline: none;
+  background: #fff;
+  color: var(--slate-700);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all .15s;
+}
+
+.detail-info-input:focus,
+.detail-info-select:focus {
+  border-color: rgb(0 88 190 / .7);
+  box-shadow: 0 0 0 3px rgb(0 88 190 / .1);
+}
+
+.detail-info-select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
 }
 
 .modal-error {

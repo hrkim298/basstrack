@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BassTrack</title>
-    <link rel="stylesheet" href="./style.css?v=3" />
-    <script defer src="./script.js?v=3"></script>
+    <link rel="stylesheet" href="./style.css?v=4" />
+    <script defer src="./script.js?v=4"></script>
   </head>
   <body>
     <div id="toast" class="toast">
@@ -52,6 +52,16 @@
               <path d="m6 6 12 12"></path>
             </svg>
           </button>
+        </div>
+
+        <!-- 상태 필터 -->
+        <div class="status-filter-row">
+          <button class="filter-btn is-active" data-filter="전체" type="button">전체</button>
+          <button class="filter-btn" data-filter="시작 전" type="button">시작 전</button>
+          <button class="filter-btn" data-filter="카피 중" type="button">카피 중</button>
+          <button class="filter-btn" data-filter="연습 중" type="button">연습 중</button>
+          <button class="filter-btn" data-filter="완료" type="button">완료</button>
+          <button class="filter-btn" data-filter="보류" type="button">보류</button>
         </div>
 
         <div class="section-heading">
@@ -115,6 +125,32 @@
           <div class="detail-edit-actions">
             <button id="detail-edit-save-btn" class="detail-edit-save" type="button">저장</button>
             <button id="detail-edit-cancel-btn" class="detail-edit-cancel" type="button">취소</button>
+          </div>
+        </div>
+
+        <!-- 연습 시작일 & 악기 카드 -->
+        <div class="detail-card">
+          <h3>연습 정보</h3>
+          <div class="detail-info-row">
+            <div class="detail-info-field">
+              <label for="detail-start-date" class="detail-info-label">연습 시작일</label>
+              <input
+                id="detail-start-date"
+                class="detail-info-input"
+                type="date"
+                aria-label="연습 시작일"
+              />
+            </div>
+            <div class="detail-info-field">
+              <label for="detail-instrument" class="detail-info-label">악기</label>
+              <select id="detail-instrument" class="detail-info-select" aria-label="악기">
+                <option value="베이스">베이스</option>
+                <option value="기타">기타</option>
+                <option value="드럼">드럼</option>
+                <option value="키보드">키보드</option>
+                <option value="기타 악기">기타 악기</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -204,6 +240,24 @@
               class="modal-input"
               type="text"
               placeholder="아티스트 이름을 입력하세요"
+            />
+          </div>
+          <div>
+            <label for="add-modal-instrument">악기</label>
+            <select id="add-modal-instrument" class="modal-input modal-select">
+              <option value="베이스">베이스</option>
+              <option value="기타">기타</option>
+              <option value="드럼">드럼</option>
+              <option value="키보드">키보드</option>
+              <option value="기타 악기">기타 악기</option>
+            </select>
+          </div>
+          <div>
+            <label for="add-modal-start-date">연습 시작일</label>
+            <input
+              id="add-modal-start-date"
+              class="modal-input"
+              type="date"
             />
           </div>
           <div id="modal-error-msg" class="modal-error hidden">

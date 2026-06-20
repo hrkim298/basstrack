@@ -1,12 +1,29 @@
 // Key for local storage persistence
 const STORAGE_KEY = "basstrack_songs_data_v1";
 
+// 오늘 날짜를 YYYY-MM-DD 형식으로 반환
+function getTodayDateString() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+// YYYY-MM-DD → YYYY.MM.DD 표시용 변환
+function formatDateForDisplay(dateStr) {
+  if (!dateStr) return '';
+  return dateStr.replace(/-/g, '.');
+}
+
 // Default tracks to load if nothing exists in storage
 const DEFAULT_TRACKS = [
   {
     id: "track-1",
     title: "Hysteria",
     artist: "Muse",
+    startDate: "2023-10-20",
+    instrument: "베이스",
     status: "연습 중",
     progressText: "인트로 16분 음표 리듬 필인 부분 집중 연습 중. 템포 110부터 맞춰가는 단계.",
     memos: [
@@ -26,6 +43,8 @@ const DEFAULT_TRACKS = [
     id: "track-2",
     title: "Sir Duke",
     artist: "Stevie Wonder",
+    startDate: "2026-06-01",
+    instrument: "베이스",
     status: "카피 중",
     progressText: "중간 브릿지 혼 섹션 유니즌 부분 운지 거의 다 외움.",
     memos: [
@@ -40,6 +59,8 @@ const DEFAULT_TRACKS = [
     id: "track-3",
     title: "Dean Town",
     artist: "Vulfpeck",
+    startDate: "2026-05-15",
+    instrument: "베이스",
     status: "완료",
     progressText: "곡 전체를 막힘 없이 완벽하게 연주 가능. 톤 메이킹도 끝났음.",
     memos: [
@@ -54,6 +75,8 @@ const DEFAULT_TRACKS = [
     id: "track-4",
     title: "Uptown Funk",
     artist: "Bruno Mars",
+    startDate: "2026-06-20",
+    instrument: "베이스",
     status: "시작 전",
     progressText: "",
     memos: []
@@ -62,6 +85,8 @@ const DEFAULT_TRACKS = [
     id: "track-5",
     title: "Teen Town",
     artist: "Weather Report",
+    startDate: "2026-05-01",
+    instrument: "베이스",
     status: "보류",
     progressText: "곡의 리듬과 멜로디 전개가 너무 난해해서 조금 나중에 기초 체력을 더 기르고 재도전할 예정.",
     memos: [
@@ -77,6 +102,7 @@ const DEFAULT_TRACKS = [
 // App State
 let tracks = [];
 let searchQuery = "";
+let statusFilter = "전체";
 let selectedTrackId = null;
 let activeDetailStatus = "시작 전";
 
@@ -89,6 +115,12 @@ function loadTracks() {
   if (saved) {
     try {
       tracks = JSON.parse(saved);
+      // 기존 데이터에 신규 필드 기본값 처리
+      tracks = tracks.map(track => ({
+        startDate: getTodayDateString(),
+        instrument: "베이스",
+        ...track
+      }));
     } catch (e) {
       console.error("Local storage loaded error, restoring defaults", e);
       tracks = JSON.parse(JSON.stringify(DEFAULT_TRACKS));
@@ -126,6 +158,17 @@ function getStatusColorClasses(status) {
   }
 }
 
+function getInstrumentEmoji(instrument) {
+  switch (instrument) {
+    case "기타": return "🎸";
+    case "드럼": return "🥁";
+    case "키보드": return "🎹";
+    case "기타 악기": return "🎵";
+    case "베이스":
+    default: return "🎸";
+  }
+}
+
 // Toast Popup Controller
 function showToast(message) {
   const toast = document.getElementById("toast");
@@ -138,6 +181,14 @@ function showToast(message) {
   setTimeout(() => {
     toast.classList.remove("is-visible");
   }, 2500);
+}
+
+// 상태 필터 UI 업데이트
+function updateFilterUI() {
+  const filterBtns = document.querySelectorAll(".filter-btn");
+  filterBtns.forEach(btn => {
+    btn.classList.toggle("is-active", btn.getAttribute("data-filter") === statusFilter);
+  });
 }
 
 // Render Main Screen List
@@ -155,9 +206,13 @@ function renderMainScreen() {
 
   const query = searchQuery.trim().toLowerCase();
   const filtered = tracks.filter(track => {
-    if (!query) return true;
-    return track.title.toLowerCase().includes(query) || 
-           track.artist.toLowerCase().includes(query);
+    // 검색어 필터
+    const matchesQuery = !query ||
+      track.title.toLowerCase().includes(query) ||
+      track.artist.toLowerCase().includes(query);
+    // 상태 필터
+    const matchesStatus = statusFilter === "전체" || track.status === statusFilter;
+    return matchesQuery && matchesStatus;
   });
 
   if (filtered.length === 0) {
@@ -194,10 +249,21 @@ function renderMainScreen() {
       `;
     }
 
+    // 시작일 & 악기 메타 정보
+    const instrument = track.instrument || "베이스";
+    const startDate = track.startDate ? formatDateForDisplay(track.startDate) : '';
+    const metaHtml = `
+      <div class="track-meta">
+        <span class="track-instrument-tag">${escapeHTML(instrument)}</span>
+        ${startDate ? `<span class="track-start-date">📅 ${escapeHTML(startDate)}</span>` : ''}
+      </div>
+    `;
+
     item.innerHTML = `
       <div class="track-main">
         <h3 class="track-title">${escapeHTML(track.title)}</h3>
         <p class="track-artist">${escapeHTML(track.artist)}</p>
+        ${metaHtml}
         ${progressPreviewHtml}
       </div>
       <div class="track-status-wrap">
@@ -292,6 +358,18 @@ function openTrackDetail(id) {
   document.getElementById("detail-artist").value = track.artist;
   document.getElementById("detail-progress").value = track.progressText || "";
   document.getElementById("detail-memo").value = "";
+
+  // 연습 시작일 & 악기 세팅
+  document.getElementById("detail-start-date").value = track.startDate || getTodayDateString();
+  const instrumentSelect = document.getElementById("detail-instrument");
+  const instrumentVal = track.instrument || "베이스";
+  // select option 중 일치하는 값 선택
+  for (let i = 0; i < instrumentSelect.options.length; i++) {
+    if (instrumentSelect.options[i].value === instrumentVal) {
+      instrumentSelect.selectedIndex = i;
+      break;
+    }
+  }
 
   // Render sub sections inside detail
   updateDetailStatusRadioUI();
@@ -412,6 +490,8 @@ function saveTrackDetail() {
   const titleVal = document.getElementById("detail-title").value.trim();
   const artistVal = document.getElementById("detail-artist").value.trim();
   const progressTextVal = document.getElementById("detail-progress").value.trim();
+  const startDateVal = document.getElementById("detail-start-date").value;
+  const instrumentVal = document.getElementById("detail-instrument").value;
 
   if (!titleVal) {
     showToast("곡명을 입력해주세요.");
@@ -423,6 +503,8 @@ function saveTrackDetail() {
   track.artist = artistVal || "Unknown Artist";
   track.status = activeDetailStatus;
   track.progressText = progressTextVal;
+  track.startDate = startDateVal || getTodayDateString();
+  track.instrument = instrumentVal || "베이스";
 
   saveTracks();
   showToast("기록이 성공적으로 저장되었습니다!");
@@ -448,6 +530,8 @@ function deleteTrack() {
 function openAddTrackModal() {
   document.getElementById("add-modal-title").value = "";
   document.getElementById("add-modal-artist").value = "";
+  document.getElementById("add-modal-instrument").selectedIndex = 0;
+  document.getElementById("add-modal-start-date").value = getTodayDateString();
   document.getElementById("modal-error-msg").classList.add("hidden");
   document.getElementById("add-track-modal").classList.remove("hidden");
 }
@@ -461,6 +545,8 @@ function closeAddTrackModal() {
 function submitNewTrack() {
   const titleInput = document.getElementById("add-modal-title").value.trim();
   const artistInput = document.getElementById("add-modal-artist").value.trim();
+  const instrumentInput = document.getElementById("add-modal-instrument").value;
+  const startDateInput = document.getElementById("add-modal-start-date").value;
   const errorEl = document.getElementById("modal-error-msg");
 
   if (!titleInput) {
@@ -473,6 +559,8 @@ function submitNewTrack() {
     id: `track-${Date.now()}`,
     title: titleInput,
     artist: artistInput || "Unknown Artist",
+    startDate: startDateInput || getTodayDateString(),
+    instrument: instrumentInput || "베이스",
     status: "시작 전",
     progressText: "",
     memos: []
@@ -525,7 +613,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Binding status radio buttons click event
+  // 상태 필터 버튼 이벤트
+  const filterBtns = document.querySelectorAll(".filter-btn");
+  filterBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      statusFilter = btn.getAttribute("data-filter");
+      updateFilterUI();
+      renderMainScreen();
+    });
+  });
+
+  // Binding status radio buttons click event (상세 페이지)
   const statusButtons = document.querySelectorAll(".status-btn");
   statusButtons.forEach(btn => {
     btn.addEventListener("click", () => {
